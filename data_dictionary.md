@@ -263,59 +263,6 @@ COUNT(CASE WHEN loan_status IN ('Fully Paid', 'Current') THEN 1 END) / COUNT(*) 
 (SUM(total_payment) - SUM(loan_amount)) / SUM(loan_amount) × 100
 ```
 
----
 
-## Data Lineage
 
-### Source Systems
-- **Origination System:** Loan applications and approvals
-- **Servicing System:** Payment tracking and status updates
-- **Credit Bureau:** Credit scores and verification
 
-### ETL Process
-1. Extract from source systems (daily at 2:00 AM)
-2. Transform and validate data
-3. Load into analytics database (6:00 AM)
-4. Power BI refresh (6:30 AM)
-
-### Data Retention
-- Active loans: Indefinite
-- Paid-off loans: 7 years from payoff date
-- Charged-off loans: 10 years for regulatory compliance
-
----
-
-## Privacy and Security
-
-### PII (Personally Identifiable Information)
-- **NOT included in this dataset:**
-  - Customer name
-  - Social Security Number
-  - Address (only state included)
-  - Phone number
-  - Email address
-
-### Data Access
-- Classified as Internal Use Only
-- Requires database authentication
-- Row-level security based on user role
-- Audit logging enabled
-
----
-
-## Change Log
-
-| Date | Version | Changes | Author |
-|------|---------|---------|--------|
-| 2024-03-01 | 1.0 | Initial documentation | Your Name |
-| 2024-03-15 | 1.1 | Added calculated fields section | Your Name |
-| 2024-04-01 | 1.2 | Updated data ranges and examples | Your Name |
-
----
-
-## Contact Information
-
-For questions about this data dictionary:
-- **Data Owner:** Analytics Team
-- **Technical Contact:** your.email@example.com
-- **Last Updated:** April 2025
