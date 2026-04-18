@@ -427,6 +427,5 @@ mysql -u username -p database_name < sql_queries/02_data_exploration.sql
 
 ---
 
-**Methodology Prepared By:** Your Name  
-**Last Updated:** April 2025  
-**Version:** 1.0
+**Methodology Prepared By:** Praveen 
+
