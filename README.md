@@ -1,6 +1,5 @@
 # 🏦 Bank Loan Performance Analysis
 
-![Project Banner](images/banner.png)
 
 ## 📊 Project Overview
 
@@ -238,33 +237,10 @@ Through this project, I demonstrated proficiency in:
 
 ---
 
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
----
-
-## 📧 Contact
-
-**Your Name**  
-- LinkedIn: [your-linkedin-profile](https://linkedin.com/in/yourprofile)
-- Email: your.email@example.com
-- Portfolio: [your-portfolio-website](https://yourwebsite.com)
-
----
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
-
 ## 🙏 Acknowledgments
 
 - Dataset inspired by real-world banking scenarios
 - Analysis framework based on industry best practices
 - Dashboard design follows financial services UX standards
 
----
 
-**⭐ If you find this project useful, please consider giving it a star!**
