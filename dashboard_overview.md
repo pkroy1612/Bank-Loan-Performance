@@ -503,16 +503,6 @@ DIVIDE(
 4. Advanced customer segmentation
 5. Automated email alerts for KPI thresholds
 
----
-
-## Support and Feedback
-
-For questions, issues, or enhancement requests:
-- Email: dataanalytics@yourbank.com
-- Internal Wiki: [Link to documentation]
-- Training Videos: [Link to tutorials]
-
----
 
 **Last Updated:** April 2025  
 **Dashboard Version:** 2.0  
