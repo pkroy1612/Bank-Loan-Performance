@@ -1,0 +1,69 @@
+# Power BI files
+*.pbix
+*.pbit
+*.pbids
+*.pbip
+
+# Excel files
+~$*.xlsx
+*.xlsm
+*.tmp
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+*.egg-info/
+
+# R
+.Rhistory
+.RData
+.Ruserdata
+
+# Database
+*.db
+*.sqlite
+*.mdf
+*.ldf
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Credentials and sensitive data
+*.env
+config.ini
+secrets.json
+credentials.json
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+temp/
+tmp/
+*.bak
+*.backup
+
+# Large data files (keep samples only)
+data/raw/*.csv
+data/processed/*.parquet
+!data/sample_*.csv
+
+# Output files
+outputs/*.pdf
+outputs/*.pptx
+!outputs/README.md

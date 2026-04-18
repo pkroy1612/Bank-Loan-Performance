@@ -1,0 +1,475 @@
+-- ============================================================================
+-- DAX Measures for Bank Loan Analysis Dashboard
+-- ============================================================================
+-- Description: Complete list of DAX formulas used in Power BI
+-- Author: Your Name
+-- Date: March 2025
+-- ============================================================================
+
+-- ============================================================================
+-- BASIC MEASURES
+-- ============================================================================
+
+Total Applications = 
+COUNT(bank_loan[loan_id])
+
+Total Funded Amount = 
+SUM(bank_loan[loan_amount])
+
+Total Amount Received = 
+SUM(bank_loan[total_payment])
+
+Average Interest Rate = 
+AVERAGE(bank_loan[int_rate])
+
+Average DTI = 
+AVERAGE(bank_loan[dti])
+
+Average Loan Amount = 
+AVERAGE(bank_loan[loan_amount])
+
+-- ============================================================================
+-- GOOD LOAN MEASURES
+-- ============================================================================
+
+Good Loan Applications = 
+CALCULATE(
+    COUNT(bank_loan[loan_id]),
+    bank_loan[loan_status] IN {"Fully Paid", "Current"}
+)
+
+Good Loan Percentage = 
+DIVIDE([Good Loan Applications], [Total Applications], 0) * 100
+
+Good Loan Funded Amount = 
+CALCULATE(
+    SUM(bank_loan[loan_amount]),
+    bank_loan[loan_status] IN {"Fully Paid", "Current"}
+)
+
+Good Loan Received Amount = 
+CALCULATE(
+    SUM(bank_loan[total_payment]),
+    bank_loan[loan_status] IN {"Fully Paid", "Current"}
+)
+
+-- ============================================================================
+-- BAD LOAN MEASURES
+-- ============================================================================
+
+Bad Loan Applications = 
+CALCULATE(
+    COUNT(bank_loan[loan_id]),
+    bank_loan[loan_status] = "Charged Off"
+)
+
+Bad Loan Percentage = 
+DIVIDE([Bad Loan Applications], [Total Applications], 0) * 100
+
+Bad Loan Funded Amount = 
+CALCULATE(
+    SUM(bank_loan[loan_amount]),
+    bank_loan[loan_status] = "Charged Off"
+)
+
+Bad Loan Received Amount = 
+CALCULATE(
+    SUM(bank_loan[total_payment]),
+    bank_loan[loan_status] = "Charged Off"
+)
+
+-- ============================================================================
+-- MONTH-TO-DATE (MTD) MEASURES
+-- ============================================================================
+
+MTD Applications = 
+TOTALMTD([Total Applications], Calendar[Date])
+
+MTD Funded Amount = 
+TOTALMTD([Total Funded Amount], Calendar[Date])
+
+MTD Amount Received = 
+TOTALMTD([Total Amount Received], Calendar[Date])
+
+MTD Average Interest Rate = 
+CALCULATE(
+    [Average Interest Rate],
+    DATESMTD(Calendar[Date])
+)
+
+MTD Average DTI = 
+CALCULATE(
+    [Average DTI],
+    DATESMTD(Calendar[Date])
+)
+
+-- ============================================================================
+-- PREVIOUS MONTH-TO-DATE (PMTD) MEASURES
+-- ============================================================================
+
+PMTD Applications = 
+CALCULATE(
+    [MTD Applications],
+    DATEADD(Calendar[Date], -1, MONTH)
+)
+
+PMTD Funded Amount = 
+CALCULATE(
+    [MTD Funded Amount],
+    DATEADD(Calendar[Date], -1, MONTH)
+)
+
+PMTD Amount Received = 
+CALCULATE(
+    [MTD Amount Received],
+    DATEADD(Calendar[Date], -1, MONTH)
+)
+
+-- ============================================================================
+-- MONTH-OVER-MONTH (MoM) CHANGE MEASURES
+-- ============================================================================
+
+MoM Applications Change = 
+[MTD Applications] - [PMTD Applications]
+
+MoM Applications % = 
+DIVIDE([MoM Applications Change], [PMTD Applications], 0) * 100
+
+MoM Funded Amount Change = 
+[MTD Funded Amount] - [PMTD Funded Amount]
+
+MoM Funded Amount % = 
+DIVIDE([MoM Funded Amount Change], [PMTD Funded Amount], 0) * 100
+
+MoM Amount Received Change = 
+[MTD Amount Received] - [PMTD Amount Received]
+
+MoM Amount Received % = 
+DIVIDE([MoM Amount Received Change], [PMTD Amount Received], 0) * 100
+
+-- ============================================================================
+-- PERFORMANCE MEASURES
+-- ============================================================================
+
+Net Profit = 
+[Total Amount Received] - [Total Funded Amount]
+
+ROI Percentage = 
+DIVIDE([Net Profit], [Total Funded Amount], 0) * 100
+
+Default Rate = 
+DIVIDE([Bad Loan Applications], [Total Applications], 0) * 100
+
+Recovery Rate = 
+DIVIDE(
+    [Bad Loan Received Amount],
+    [Bad Loan Funded Amount],
+    0
+) * 100
+
+Loss Given Default = 
+DIVIDE(
+    [Bad Loan Funded Amount] - [Bad Loan Received Amount],
+    [Bad Loan Funded Amount],
+    0
+) * 100
+
+-- ============================================================================
+-- TIME INTELLIGENCE MEASURES
+-- ============================================================================
+
+YTD Applications = 
+TOTALYTD([Total Applications], Calendar[Date])
+
+YTD Funded Amount = 
+TOTALYTD([Total Funded Amount], Calendar[Date])
+
+PY Applications = 
+CALCULATE(
+    [Total Applications],
+    SAMEPERIODLASTYEAR(Calendar[Date])
+)
+
+YoY Applications % = 
+DIVIDE(
+    [Total Applications] - [PY Applications],
+    [PY Applications],
+    0
+) * 100
+
+-- ============================================================================
+-- MOVING AVERAGES
+-- ============================================================================
+
+3-Month Moving Avg Applications = 
+AVERAGEX(
+    DATESINPERIOD(
+        Calendar[Date],
+        LASTDATE(Calendar[Date]),
+        -3,
+        MONTH
+    ),
+    [Total Applications]
+)
+
+6-Month Moving Avg Funded = 
+AVERAGEX(
+    DATESINPERIOD(
+        Calendar[Date],
+        LASTDATE(Calendar[Date]),
+        -6,
+        MONTH
+    ),
+    [Total Funded Amount]
+)
+
+-- ============================================================================
+-- RANKING MEASURES
+-- ============================================================================
+
+State Rank by Volume = 
+RANKX(
+    ALL(bank_loan[address_state]),
+    [Total Applications],
+    ,
+    DESC,
+    DENSE
+)
+
+Purpose Rank by Amount = 
+RANKX(
+    ALL(bank_loan[purpose]),
+    [Total Funded Amount],
+    ,
+    DESC,
+    DENSE
+)
+
+-- ============================================================================
+-- CONDITIONAL MEASURES
+-- ============================================================================
+
+Status Indicator = 
+SWITCH(
+    TRUE(),
+    [MoM Applications %] > 0, "↑",
+    [MoM Applications %] < 0, "↓",
+    "→"
+)
+
+Risk Level = 
+SWITCH(
+    TRUE(),
+    [Default Rate] < 10, "Low",
+    [Default Rate] < 15, "Medium",
+    "High"
+)
+
+Performance Category = 
+SWITCH(
+    TRUE(),
+    [ROI Percentage] > 15 && [Default Rate] < 10, "Excellent",
+    [ROI Percentage] > 10 && [Default Rate] < 15, "Good",
+    [ROI Percentage] > 5, "Fair",
+    "Poor"
+)
+
+-- ============================================================================
+-- FORMATTING MEASURES
+-- ============================================================================
+
+Funded Amount Formatted = 
+"$" & FORMAT([Total Funded Amount] / 1000000, "#,##0.0") & "M"
+
+Applications with Trend = 
+[Total Applications] & " " & [Status Indicator]
+
+Interest Rate Formatted = 
+FORMAT([Average Interest Rate], "0.00") & "%"
+
+DTI Formatted = 
+FORMAT([Average DTI], "0.00") & "%"
+
+-- ============================================================================
+-- CALCULATED COLUMNS (Use sparingly - prefer measures)
+-- ============================================================================
+
+-- Profit/Loss per Loan
+Profit Loss = 
+bank_loan[total_payment] - bank_loan[loan_amount]
+
+-- Loan Age in Days
+Loan Age Days = 
+DATEDIFF(bank_loan[issue_date], TODAY(), DAY)
+
+-- Loan Age Category
+Loan Age Category = 
+SWITCH(
+    TRUE(),
+    bank_loan[Loan Age Days] < 180, "0-6 months",
+    bank_loan[Loan Age Days] < 365, "6-12 months",
+    bank_loan[Loan Age Days] < 730, "1-2 years",
+    "2+ years"
+)
+
+-- Risk Score (Composite)
+Risk Score = 
+SWITCH(bank_loan[grade], "A", 1, "B", 2, "C", 3, "D", 4, "E", 5, "F", 6, "G", 7, 0) +
+SWITCH(TRUE(), bank_loan[dti] < 10, 0, bank_loan[dti] < 20, 1, bank_loan[dti] < 30, 2, 3) +
+SWITCH(bank_loan[verification_status], "Verified", 0, "Source Verified", 1, 2)
+
+-- Loan Status Color
+Status Color = 
+SWITCH(
+    bank_loan[loan_status],
+    "Fully Paid", "#00B050",
+    "Current", "#FFC000",
+    "Charged Off", "#FF0000",
+    "#808080"
+)
+
+-- ============================================================================
+-- ADVANCED MEASURES
+-- ============================================================================
+
+-- Cumulative Applications
+Cumulative Applications = 
+CALCULATE(
+    [Total Applications],
+    FILTER(
+        ALL(Calendar[Date]),
+        Calendar[Date] <= MAX(Calendar[Date])
+    )
+)
+
+-- Running Total Funded
+Running Total Funded = 
+CALCULATE(
+    [Total Funded Amount],
+    FILTER(
+        ALLSELECTED(Calendar[Date]),
+        Calendar[Date] <= MAX(Calendar[Date])
+    )
+)
+
+-- Percentage of Total (Applications)
+% of Total Applications = 
+DIVIDE(
+    [Total Applications],
+    CALCULATE(
+        [Total Applications],
+        ALL(bank_loan)
+    ),
+    0
+) * 100
+
+-- Weighted Average Interest Rate
+Weighted Avg Interest Rate = 
+SUMX(
+    bank_loan,
+    bank_loan[int_rate] * bank_loan[loan_amount]
+) / [Total Funded Amount]
+
+-- Portfolio Concentration Risk
+Concentration Risk = 
+DIVIDE(
+    MAXX(
+        VALUES(bank_loan[address_state]),
+        CALCULATE([Total Funded Amount])
+    ),
+    [Total Funded Amount],
+    0
+) * 100
+
+-- ============================================================================
+-- KPI COMPARISON MEASURES
+-- ============================================================================
+
+Applications vs Target = 
+VAR TargetApplications = 3000
+RETURN
+[MTD Applications] - TargetApplications
+
+Target Achievement % = 
+VAR TargetApplications = 3000
+RETURN
+DIVIDE([MTD Applications], TargetApplications, 0) * 100
+
+-- ============================================================================
+-- DYNAMIC MEASURES
+-- ============================================================================
+
+Selected Metric = 
+SWITCH(
+    SELECTEDVALUE('Metric Selector'[Metric]),
+    "Applications", [Total Applications],
+    "Funded Amount", [Total Funded Amount],
+    "Received Amount", [Total Amount Received],
+    "Net Profit", [Net Profit],
+    [Total Applications]  -- Default
+)
+
+-- ============================================================================
+-- TEXT MEASURES (For Card Visuals)
+-- ============================================================================
+
+Good Loan Summary = 
+"Good Loans: " & FORMAT([Good Loan Percentage], "0.0") & "% | " &
+FORMAT([Good Loan Applications], "#,##0") & " Loans | $" &
+FORMAT([Good Loan Funded Amount] / 1000000, "#,##0.0") & "M"
+
+Performance Summary = 
+"ROI: " & FORMAT([ROI Percentage], "0.0") & "% | " &
+"Default Rate: " & FORMAT([Default Rate], "0.0") & "% | " &
+"Net Profit: $" & FORMAT([Net Profit] / 1000000, "#,##0.0") & "M"
+
+-- ============================================================================
+-- FILTER CONTEXT MEASURES
+-- ============================================================================
+
+Active Filters = 
+CONCATENATEX(
+    FILTERS(bank_loan[grade]),
+    bank_loan[grade],
+    ", "
+)
+
+Filtered Applications = 
+IF(
+    ISFILTERED(bank_loan[grade]),
+    [Total Applications],
+    BLANK()
+)
+
+-- ============================================================================
+-- ERROR HANDLING MEASURES
+-- ============================================================================
+
+Safe Division Example = 
+VAR Numerator = [Total Amount Received]
+VAR Denominator = [Total Funded Amount]
+RETURN
+    IF(
+        Denominator = 0,
+        BLANK(),
+        DIVIDE(Numerator, Denominator)
+    )
+
+-- ============================================================================
+-- End of DAX Measures
+-- ============================================================================
+
+/*
+NOTES FOR DASHBOARD DEVELOPERS:
+
+1. Use measures instead of calculated columns whenever possible for better performance
+2. Avoid iterating functions (SUMX, FILTER) on large datasets in measures
+3. Test measures with different filter contexts
+4. Use variables (VAR) to improve readability and performance
+5. Add error handling for division by zero
+6. Format measures appropriately for card visuals
+7. Document complex measures with comments
+8. Use BLANK() instead of 0 where appropriate for clarity
+9. Consider creating measure groups for organization
+10. Regularly review and optimize slow-performing measures
+*/
