@@ -387,8 +387,3 @@ The bank loan portfolio demonstrates solid overall performance with a **13.8% de
 
 By implementing the recommended strategies, the bank can expect to improve portfolio ROI to **10.2%+** while reducing default rates to **11.2%** within 12 months.
 
----
-
-**Report Prepared By:** Your Name  
-**Date:** April 2025  
-**Contact:** your.email@example.com
