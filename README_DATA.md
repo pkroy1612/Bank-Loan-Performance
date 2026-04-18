@@ -53,6 +53,4 @@ This project analyzes financial data. Ensure any real data used complies with:
 
 **Never commit real customer PII to public repositories.**
 
----
 
-For questions about data access, contact: your.email@example.com
